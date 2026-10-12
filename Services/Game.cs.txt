@@ -1,53 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
+using CatAndMouse.Models;
 
-namespace CatAndMouse
+namespace CatAndMouse.Services
 {
-    public enum State
-    {
-        Winner,
-        Loser,
-        Playing,
-        NotInGame
-    }
-
-    public enum GameState
-    {
-        Start,
-        End
-    }
-
-    public class Player
-    {
-        public string Name { get; set; }
-        public int Location { get; set; } = -1;
-        public State State { get; set; } = State.NotInGame;
-        public int DistanceTraveled { get; set; } = 0;
-
-        public Player(string name)
-        {
-            Name = name;
-            Location = -1;
-        }
-
-        public void Move(int steps, int fieldSize)
-        {
-            if (State == State.NotInGame)
-            {
-                int initialPos = ((steps - 1) % fieldSize + fieldSize) % fieldSize + 1;
-                Location = initialPos;
-                State = State.Playing;
-            }
-            else
-            {
-                int newZeroBased = ((Location - 1 + steps) % fieldSize + fieldSize) % fieldSize;
-                Location = newZeroBased + 1;
-                DistanceTraveled += Math.Abs(steps);
-            }
-        }
-    }
-
     public class Game
     {
         public static string InputFile { get; set; } = "ChaseData.txt";
@@ -125,7 +82,7 @@ namespace CatAndMouse
             logBuffer.AppendLine();
             logBuffer.AppendLine();
             logBuffer.AppendLine($"Distance traveled:   Mouse    Cat");
-            logBuffer.AppendLine($"                      {Mouse.DistanceTraveled,4}   {Cat.DistanceTraveled,4}");
+            logBuffer.AppendLine($"                      {Mouse.DistanceTraveled,4}    {Cat.DistanceTraveled,4}");
             logBuffer.AppendLine();
 
             if (Mouse.State == State.Loser)
@@ -171,29 +128,13 @@ namespace CatAndMouse
             }
         }
 
-        private int GetDistance()
+        public int GetDistance()
         {
             if (Cat.State == State.NotInGame || Mouse.State == State.NotInGame) return -1;
 
             int d1 = Math.Abs(Cat.Location - Mouse.Location);
             int d2 = Size - d1;
             return Math.Min(d1, d2);
-        }
-    }
-
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            for (int i = 1; i <= 3; i++)
-            {
-                Console.WriteLine($"================ ИГРА {i} ================");
-                Game.InputFile = $"{i}.ChaseData.txt";
-                Game.OutFile = $"{i}.PursuitLog.txt";
-
-                Game game = new Game(10000);
-                game.Run();
-            }
         }
     }
 }
